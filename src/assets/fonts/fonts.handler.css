@@ -1,0 +1,18 @@
+@font-face {
+    font-family: 'Sen';
+    src: url("Sen/Sen-VariableFont_wght.ttf")
+}
+
+@font-face {
+    font-family: 'Yeseva_One';
+    src: url("Yeseva_One/YesevaOne-Regular.ttf");
+}
+
+@font-face {
+    font-family: 'Cousine';
+    src: url("Cousine/Cousine-Regular.ttf");
+}
+
+* {
+    font-family: Cousine, sans-serif !important;
+}
