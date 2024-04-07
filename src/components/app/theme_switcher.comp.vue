@@ -1,7 +1,7 @@
 <template>
   <v-menu open-on-hover open-delay="1000">
     <template v-slot:activator="{ props }">
-      <v-btn variant="plain" v-on:click="switch_theme" icon v-bind="props" color="theme">
+      <v-btn v-if="variants.length > 1" variant="plain" v-on:click="switch_theme" icon v-bind="props" color="theme">
         <v-icon :icon="['fas', themes[theme].icon]" />
       </v-btn>
 

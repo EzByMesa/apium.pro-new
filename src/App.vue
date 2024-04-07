@@ -1,8 +1,8 @@
 <template>
   <v-app :theme="theme">
     <system-bar />
-    <v-main>
-      <v-container>
+    <v-main class="d-flex justify-center align-center">
+      <v-container class="d-flex align-center justify-center">
         <router-view />
       </v-container>
     </v-main>
@@ -12,10 +12,17 @@
 <script>
 import SystemBar from "@/components/app/system-bar.comp.vue"
 import { theme } from "@/store/theme.store.js"
+import {CurrentPlaying, CurrentPlayingArtwork} from "@/store/radio/current.store.js";
 
 export default {
   name: 'App',
   components: { SystemBar },
+  beforeMount() {
+    setInterval(() => {
+      CurrentPlaying().reload()
+      CurrentPlayingArtwork().reload()
+    }, 1000)
+  },
   computed: {
     theme: {
       get() {
