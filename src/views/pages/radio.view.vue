@@ -1,43 +1,45 @@
 <template>
-  <v-sheet color="transparent" min-width="50%">
-    <v-card rounded="xl" flat class="text-center mb-10" :color="average" variant="outlined">
-      <template v-slot:title>
-        <v-sheet v-if="title" color="transparent" class="my-1 pa-2" rounded="xl">
-          <span style="font-size: 30px; font-family: Yeseva_One, sans-serif !important;">{{ artist }}</span>
-        </v-sheet>
-        <v-sheet v-else color="transparent" class="my-1 pa-2" rounded="xl">
-          <span style="font-size: 30px; font-family: Yeseva_One, sans-serif !important;">OFFLINE</span>
-        </v-sheet>
-      </template>
-      <template v-slot:subtitle v-if="title">
-        <v-sheet class="my-1 pa-2" rounded="xl" color="transparent">
-          <span style="font-size: 30px; font-family: Yeseva_One, sans-serif !important;">{{ composition }}</span>
-        </v-sheet>
-      </template>
-    </v-card>
-    <v-hover v-slot="{ isHovering, props }" v-if="title">
-      <v-sheet style="position: relative;" :style="get_shadow()" rounded="xl" :class="playing ? 'fade' : null" v-bind="props">
-        <v-img id="artwork" :color="artwork ? 'transparent' : 'accent'" rounded="xl" :src="artwork" cover aspect-ratio="1 / 1" width="100%" />
-        <v-fade-transition>
-          <v-sheet color="transparent" class="d-flex justify-center align-center" rounded="xl" width="100%" height="100%" style="position: absolute; top: 0; left: 0; backdrop-filter: blur(10px)" v-if="isHovering">
-            <v-btn style="backdrop-filter: blur(10px)" icon v-on:click="play()" v-if="!playing" :color="inverted" flat size="200">
-              <v-icon style="font-size: 40px" :icon="['fas', 'play']" />
-            </v-btn>
-            <v-sheet color="transparent">
-              <v-btn style="backdrop-filter: blur(10px)" icon v-on:click="stop()" v-if="playing" :color="inverted" flat size="200">
-                <v-icon style="font-size: 40px" :icon="['fas', 'stop']" />
-              </v-btn>
-
-              <div class="d-flex justify-space-between align-center" v-if="playing">
-                <v-icon v-on:click="muted ? unmute() : mute()" class="mx-2" :icon="['fas', volume === 0 || muted ? 'volume-xmark' : (volume >= 0.5 ? 'volume-high' : 'volume-low')]" />
-                <v-slider :color="average" :disabled="muted" min="0" max="1" step="0.1" v-model="volume" hide-details />
-              </div>
-            </v-sheet>
+  <v-row>
+    <v-col cols="12" lg="4" md="6" sm="6" offset-lg="4" offset-md="3" offset-sm="3">
+      <v-card rounded="xl" flat class="text-center mb-10" :color="average" variant="outlined">
+        <template v-slot:title>
+          <v-sheet v-if="title" color="transparent" class="my-1 pa-2" rounded="xl">
+            <span style="font-size: 30px; font-family: Yeseva_One, sans-serif !important;">{{ artist }}</span>
           </v-sheet>
-        </v-fade-transition>
-      </v-sheet>
-    </v-hover>
-  </v-sheet>
+          <v-sheet v-else color="transparent" class="my-1 pa-2" rounded="xl">
+            <span style="font-size: 30px; font-family: Yeseva_One, sans-serif !important;">OFFLINE</span>
+          </v-sheet>
+        </template>
+        <template v-slot:subtitle v-if="title">
+          <v-sheet class="my-1 pa-2" rounded="xl" color="transparent">
+            <span style="font-size: 30px; font-family: Yeseva_One, sans-serif !important;">{{ composition }}</span>
+          </v-sheet>
+        </template>
+      </v-card>
+      <v-hover v-slot="{ isHovering, props }" v-if="title">
+        <v-card style="position: relative;" :style="get_shadow()" rounded="xl" :class="playing ? 'fade' : null" v-bind="props">
+          <v-img id="artwork" :color="artwork ? 'transparent' : 'accent'" rounded="xl" :src="artwork" cover aspect-ratio="1 / 1" width="100%" />
+          <v-fade-transition>
+            <v-sheet color="transparent" class="d-flex justify-center align-center" rounded="xl" width="100%" height="100%" style="position: absolute; top: 0; left: 0; backdrop-filter: blur(10px)" v-if="isHovering">
+              <v-btn style="backdrop-filter: blur(10px)" icon v-on:click="play()" v-if="!playing" :color="inverted" flat size="200">
+                <v-icon style="font-size: 40px" :icon="['fas', 'play']" />
+              </v-btn>
+              <v-sheet color="transparent">
+                <v-btn style="backdrop-filter: blur(10px)" icon v-on:click="stop()" v-if="playing" :color="inverted" flat size="200">
+                  <v-icon style="font-size: 40px" :icon="['fas', 'stop']" />
+                </v-btn>
+
+                <div class="d-flex justify-space-between align-center" v-if="playing">
+                  <v-icon v-on:click="muted ? unmute() : mute()" class="mx-2" :icon="['fas', volume === 0 || muted ? 'volume-xmark' : (volume >= 0.5 ? 'volume-high' : 'volume-low')]" />
+                  <v-slider :color="average" :disabled="muted" min="0" max="1" step="0.1" v-model="volume" hide-details />
+                </div>
+              </v-sheet>
+            </v-sheet>
+          </v-fade-transition>
+        </v-card>
+      </v-hover>
+    </v-col>
+  </v-row>
 </template>
 
 
