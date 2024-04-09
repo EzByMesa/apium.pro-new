@@ -4,7 +4,7 @@ export function average (src) {
         imgEl.src = src
         imgEl.onload = () => {
             let blockSize = 5,
-                defaultRGB = {r:0,g:0,b:0},
+                defaultRGB = { r:0, g:0, b:0 },
                 canvas = document.createElement('canvas'),
                 context = canvas.getContext && canvas.getContext('2d'),
                 data, width, height,

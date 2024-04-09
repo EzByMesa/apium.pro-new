@@ -1,62 +1,73 @@
 <template>
   <v-row>
     <v-col cols="12" lg="4" md="6" sm="6" offset-lg="4" offset-md="3" offset-sm="3">
-      <v-card rounded="xl" flat class="text-center mb-10" :color="average" variant="outlined">
-        <template v-slot:title>
-          <v-sheet v-if="title" color="transparent" class="my-1 pa-2" rounded="xl">
-            <span style="font-size: 30px; font-family: Yeseva_One, sans-serif !important;">{{ artist }}</span>
+      <v-sheet rounded="xl" flat class="text-center" color="transparent">
+        <v-sheet v-if="title" color="transparent" class="my-1 pa-2" id="title_holder" rounded="xl">
+          <span style="font-size: 30px; font-family: Yeseva_One, sans-serif !important;">{{ artist }}</span>
+          <v-divider :color="inverted" />
+          <span style="font-size: 30px; font-family: Sen, sans-serif !important;">{{ composition }}</span>
+        </v-sheet>
+        <v-sheet v-else color="transparent" class="my-1 pa-2" rounded="xl">
+          <span style="font-size: 30px; font-family: Yeseva_One, sans-serif !important;">OFFLINE</span>
+        </v-sheet>
+      </v-sheet>
+      <v-card v-on:click="playing ? stop() : play()" v-if="title" class="my-10 d-flex justify-center align-center" :style="get_shadow()" rounded="xl" :class="playing ? 'fade' : null">
+        <v-img id="artwork" :color="artwork ? 'transparent' : 'accent'" rounded="xl" :src="artwork" cover aspect-ratio="1 / 1" width="100%" />
+        <v-fade-transition>
+          <v-sheet color="transparent" class="d-flex justify-center align-center" rounded="xl" width="100%" height="100%" style="position: absolute; top: 0; left: 0; backdrop-filter: blur(10px)" v-if="leblure">
+            <span v-if="volume === 100">РАЗРУШИТЕЛЬ ПЕРЕПОНОК</span>
+            <span v-else-if="volume > 0">ГРОМКОСТЬ {{ volume }}%</span>
+            <span v-else>ЗВУК ВЫКЛЮЧЕН</span>
           </v-sheet>
-          <v-sheet v-else color="transparent" class="my-1 pa-2" rounded="xl">
-            <span style="font-size: 30px; font-family: Yeseva_One, sans-serif !important;">OFFLINE</span>
-          </v-sheet>
-        </template>
-        <template v-slot:subtitle v-if="title">
-          <v-sheet class="my-1 pa-2" rounded="xl" color="transparent">
-            <span style="font-size: 30px; font-family: Yeseva_One, sans-serif !important;">{{ composition }}</span>
-          </v-sheet>
-        </template>
+        </v-fade-transition>
       </v-card>
-      <v-hover v-slot="{ isHovering, props }" v-if="title">
-        <v-card style="position: relative;" :style="get_shadow()" rounded="xl" :class="playing ? 'fade' : null" v-bind="props">
-          <v-img id="artwork" :color="artwork ? 'transparent' : 'accent'" rounded="xl" :src="artwork" cover aspect-ratio="1 / 1" width="100%" />
-          <v-fade-transition>
-            <v-sheet color="transparent" class="d-flex justify-center align-center" rounded="xl" width="100%" height="100%" style="position: absolute; top: 0; left: 0; backdrop-filter: blur(10px)" v-if="isHovering">
-              <v-btn style="backdrop-filter: blur(10px)" icon v-on:click="play()" v-if="!playing" :color="inverted" flat size="200">
-                <v-icon style="font-size: 40px" :icon="['fas', 'play']" />
-              </v-btn>
-              <v-sheet color="transparent">
-                <v-btn style="backdrop-filter: blur(10px)" icon v-on:click="stop()" v-if="playing" :color="inverted" flat size="200">
-                  <v-icon style="font-size: 40px" :icon="['fas', 'stop']" />
-                </v-btn>
 
-                <div class="d-flex justify-space-between align-center" v-if="playing">
-                  <v-icon v-on:click="muted ? unmute() : mute()" class="mx-2" :icon="['fas', volume === 0 || muted ? 'volume-xmark' : (volume >= 0.5 ? 'volume-high' : 'volume-low')]" />
-                  <v-slider :color="average" :disabled="muted" min="0" max="1" step="0.1" v-model="volume" hide-details />
-                </div>
-              </v-sheet>
-            </v-sheet>
-          </v-fade-transition>
-        </v-card>
-      </v-hover>
+      <v-sheet color="transparent" class="d-flex justify-center align-center" rounded="xl" v-if="title">
+        <v-btn :color="inverted" flat rounded="xl" variant="plain">
+          <template v-slot:append>
+            <v-icon :icon="['fas', 'circle']" fade />
+          </template>
+          <template v-slot:default>
+            LIVE
+          </template>
+        </v-btn>
+
+        <v-slider
+            v-if="playing"
+            :thumb-color="average" :disabled="muted"
+            min="0" max="100" step="5"
+            :track-color="inverted"
+            v-model="volume" hide-details
+            v-on:start="leblure = true"
+            v-on:end="leblure = false"
+        />
+
+        <v-chip v-if="playing" variant="text" :color="inverted" class="mx-2" v-on:click="muted ? unmute() : mute()">
+          <v-icon :icon="['fas', volume === 0 || muted ? 'volume-xmark' : (volume >= 50 ? 'volume-high' : 'volume-low')]" />
+        </v-chip>
+      </v-sheet>
     </v-col>
   </v-row>
 </template>
 
 
 <script>
-
 import { CurrentPlaying, CurrentPlayingArtwork } from "@/store/radio/current.store.js"
-import { average } from "@/libs/average.js";
-import invert from 'invert-color';
-import { themes } from "@/plugins/themes.js";
-import { theme } from "@/store/theme.store.js";
-import {averageColor, isMuted, isPlaying, musicVolume, radioSource} from "@/store/radio/playing.store.js";
+import { average } from "@/libs/average.js"
+import invert from 'invert-color'
+import { themes } from "@/plugins/themes.js"
+import { theme } from "@/store/theme.store.js"
+import { averageColor, isMuted, isPlaying, musicVolume, radioSource } from "@/store/radio/playing.store.js"
 
 export default {
   name: 'RadioView',
   data() {
     return {
-
+      leblure: false,
+      delay: false,
+      marquee: false,
+      levels: 16,
+      bands: null
     }
   },
   async beforeMount() {
@@ -71,14 +82,18 @@ export default {
     },
   },
   methods: {
+    focus_blur: function (event) {
+      console.log(event)
+      this.leblure = true
+    },
     update_volume: function () {
-      this.source.volume = this.volume
+      this.source.volume = this.volume / 100
     },
     play: function () {
       this.source = new Audio()
       this.source.src = 'https://radio.apium.pro/type=https?nocache'
       this.source.play()
-      this.source.volume = this.volume
+      this.source.volume = this.volume / 100
       this.playing = true
     },
     stop: function () {
@@ -113,12 +128,13 @@ export default {
       return this.title.split('-')[1]
     },
     inverted() {
-      console.log(themes[theme().get()].dark)
-      if (themes[theme().get()].dark) {
-        return invert(this.average, { black: this.average, white: 'opposite' })
-      } else {
-        return invert(this.average, { black: 'opposite', white: this.average })
-      }
+      if (this.average) {
+        if (themes[theme().get()].dark) {
+          return invert(this.average, { black: this.average, white: 'opposite' })
+        } else {
+          return invert(this.average, { black: 'opposite', white: this.average })
+        }
+      } return this.average
     },
     title: {
       get() {
