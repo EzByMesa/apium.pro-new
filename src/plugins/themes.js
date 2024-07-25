@@ -9,7 +9,8 @@ export const themes = {
             card: '#282828',
             background: '#2d2d2d',
             accent: '#219b98',
-            opposite: '#c5c5c5'
+            opposite: '#c5c5c5',
+            reddish: '#c2533b'
         }
     },
     light: {
@@ -22,7 +23,8 @@ export const themes = {
             card: '#e7e7e7',
             background: '#f8f8f8',
             accent: '#b4b90b',
-            opposite: '#2c2c2c'
+            opposite: '#2c2c2c',
+            reddish: '#c2533b'
         }
     }
 }

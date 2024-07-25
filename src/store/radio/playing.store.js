@@ -33,7 +33,7 @@ export const isMuted = defineStore({
 export const musicVolume = defineStore({
     id: 'volume_radio_store',
     state: () => ({
-        volume: 75
+        volume: 100
     }),
     actions: {
         set(value) {

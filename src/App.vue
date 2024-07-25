@@ -1,8 +1,8 @@
 <template>
   <v-app :theme="theme">
     <system-bar />
-    <v-main class="d-flex justify-center align-center">
-      <v-container class="d-flex align-center justify-center">
+    <v-main class="d-flex justify-center align-center" style="height: 100%; width: 100%;">
+      <v-container class="d-flex align-center justify-center" style="height: 100%; width: 100%;">
         <router-view />
       </v-container>
     </v-main>
@@ -12,7 +12,7 @@
 <script>
 import SystemBar from "@/components/app/system-bar.comp.vue"
 import { theme } from "@/store/theme.store.js"
-import {CurrentPlaying, CurrentPlayingArtwork} from "@/store/radio/current.store.js";
+import { CurrentPlaying, CurrentPlayingArtwork } from "@/store/radio/current.store.js";
 
 export default {
   name: 'App',
@@ -38,7 +38,9 @@ export default {
 
 <style>
 @import "assets/fonts/fonts.handler.css";
-
+* {
+  transition: 0.3s
+}
 
 ::-webkit-scrollbar {
   width: 0px !important;

@@ -13,6 +13,21 @@
     src: url("Cousine/Cousine-Regular.ttf");
 }
 
+@font-face {
+    font-family: 'TeXGyreCursor';
+    src: url("texgyrecursor/texgyrecursor-regular.otf");
+}
+
+@font-face {
+    font-family: 'JetBrains Mono';
+    src: url("JetBrains_Mono/JetBrainsMono-Regular.ttf");
+}
+
+@font-face {
+    font-family: 'Montserrat';
+    src: url("Montserrat/Montserrat-Regular.ttf");
+}
+
 * {
-    font-family: Cousine, sans-serif !important;
+    font-family: "Montserrat", sans-serif !important;
 }

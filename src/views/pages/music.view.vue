@@ -3,9 +3,12 @@
     <v-col cols="12" lg="4" md="6" sm="6" offset-lg="4" offset-md="3" offset-sm="3">
       <v-sheet rounded="xl" flat class="text-center" color="transparent">
         <v-sheet v-if="title" color="transparent" class="my-1 pa-2" id="title_holder" rounded="xl">
+          <p style="font-size: 30px; font-family: Sen, sans-serif !important;">{{ composition }} </p>
+          <p style="margin-top: -10px; font-size: 10px; font-family: Sen, sans-serif !important;" v-if="album !== composition">
+            <span class="font-weight-bold">{{ album }}</span>
+          </p>
+          <v-spacer />
           <span style="font-size: 30px; font-family: Yeseva_One, sans-serif !important;">{{ artist }}</span>
-          <v-divider :color="inverted" />
-          <span style="font-size: 30px; font-family: Sen, sans-serif !important;">{{ composition }}</span>
         </v-sheet>
         <v-sheet v-else color="transparent" class="my-1 pa-2" rounded="xl">
           <span style="font-size: 30px; font-family: Yeseva_One, sans-serif !important;">OFFLINE</span>
@@ -14,35 +17,29 @@
       <v-card v-on:click="playing ? stop() : play()" v-if="title" class="my-10 d-flex justify-center align-center" :style="get_shadow()" rounded="xl" :class="playing ? 'fade' : null">
         <v-img id="artwork" :color="artwork ? 'transparent' : 'accent'" rounded="xl" :src="artwork" cover aspect-ratio="1 / 1" width="100%" />
         <v-fade-transition>
-          <v-sheet color="transparent" class="d-flex justify-center align-center" rounded="xl" width="100%" height="100%" style="position: absolute; top: 0; left: 0; backdrop-filter: blur(10px)" v-if="leblure">
-            <span v-if="volume === 100">РАЗРУШИТЕЛЬ ПЕРЕПОНОК</span>
-            <span v-else-if="volume > 0">ГРОМКОСТЬ {{ volume }}%</span>
-            <span v-else>ЗВУК ВЫКЛЮЧЕН</span>
+          <v-sheet :color="check_is_dark(inverted2) ? '#00000033' : '#ffffff55'/*inverted2+'99'*/" class="d-flex justify-center align-center"
+                   rounded="xl" width="100%" height="100%" style="position: absolute; top: 0; left: 0; backdrop-filter: blur(20px);" v-if="leblure">
+            <v-chip style="font-size: 40px" variant="text" :color="average">
+              <span v-if="volume === 100">МАКСИМУМ</span>
+              <span v-else-if="volume > 0">ГРОМКОСТЬ {{ volume }}%</span>
+              <span v-else>ЗВУК ВЫКЛЮЧЕН</span>
+            </v-chip>
           </v-sheet>
         </v-fade-transition>
       </v-card>
 
-      <v-sheet color="transparent" class="d-flex justify-center align-center" rounded="xl" v-if="title">
-        <v-btn :color="inverted" flat rounded="xl" variant="plain">
-          <template v-slot:append>
-            <v-icon :icon="['fas', 'circle']" fade />
-          </template>
-          <template v-slot:default>
-            LIVE
-          </template>
-        </v-btn>
-
+      <v-sheet color="transparent" class="d-flex justify-center align-center" rounded="xl" v-if="title && playing && !$vuetify.display.platform.ios">
         <v-slider
             v-if="playing"
             :thumb-color="average" :disabled="muted"
-            min="0" max="100" step="5"
+            min="0" max="100" step="1"
             :track-color="inverted"
             v-model="volume" hide-details
             v-on:start="leblure = true"
             v-on:end="leblure = false"
         />
 
-        <v-chip v-if="playing" variant="text" :color="inverted" class="mx-2" v-on:click="muted ? unmute() : mute()">
+        <v-chip v-if="playing" variant="text" :color="inverted" class="mx-2">
           <v-icon :icon="['fas', volume === 0 || muted ? 'volume-xmark' : (volume >= 50 ? 'volume-high' : 'volume-low')]" />
         </v-chip>
       </v-sheet>
@@ -60,7 +57,7 @@ import { theme } from "@/store/theme.store.js"
 import { averageColor, isMuted, isPlaying, musicVolume, radioSource } from "@/store/radio/playing.store.js"
 
 export default {
-  name: 'RadioView',
+  name: 'MusicView',
   data() {
     return {
       leblure: false,
@@ -82,6 +79,15 @@ export default {
     },
   },
   methods: {
+    check_is_dark: function (color) {
+      var c = color.substring(1);      // strip #
+      var rgb = parseInt(c, 16);   // convert rrggbb to decimal
+      var r = (rgb >> 16) & 0xff;  // extract red
+      var g = (rgb >>  8) & 0xff;  // extract green
+      var b = (rgb >>  0) & 0xff;  // extract blue
+      var luma = 0.2126 * r + 0.7152 * g + 0.0722 * b; // per ITU-R BT.709
+      return luma < 40 ? true : false
+    },
     focus_blur: function (event) {
       console.log(event)
       this.leblure = true
@@ -107,7 +113,7 @@ export default {
     },
     unmute: function () {
       this.muted = false
-      this.source.volume = this.volume
+      this.source.volume = this.volume / 100
     },
     average_color: async function () {
       if (this.artwork) {
@@ -121,11 +127,39 @@ export default {
     }
   },
   computed: {
+    title: {
+      get() {
+        return CurrentPlaying().get()
+      },
+      set(value) {
+        CurrentPlaying().set(value)
+      }
+    },
     artist() {
-      return this.title.split('-')[0]
+      let artist = this.title.split(' - ')[0]
+      let artists = artist.split('/')
+      if (artists.length <= 1) {
+        artists = artist.split(',')
+      }
+
+      let artist_str = ''
+
+      if (artists.length > 1) {
+        for (let [index, artist] of artists.entries()) {
+          artist_str += artist
+          if (index === 0) artist_str += ' ft. '
+          else if (index < artists.length - 1) artist_str += ', '
+        }
+      } else {
+        artist_str += artists[0]
+      }
+      return artist_str
     },
     composition() {
-      return this.title.split('-')[1]
+      return this.title.split(' - ')[1]
+    },
+    album() {
+      return this.title.split(' - ')[2]
     },
     inverted() {
       if (this.average) {
@@ -136,13 +170,9 @@ export default {
         }
       } return this.average
     },
-    title: {
-      get() {
-        return CurrentPlaying().get()
-      },
-      set(value) {
-        CurrentPlaying().set(value)
-      }
+    inverted2() {
+      if (this.average) return invert(this.average)
+      return this.average
     },
     artwork: {
       get() {

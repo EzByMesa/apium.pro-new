@@ -1,5 +1,7 @@
 <template>
+  <v-sheet color="accent" class="pa-2">
 
+  </v-sheet>
 </template>
 
 <script>

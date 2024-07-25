@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/pages/home.view.vue'
 import FourOFour from '@/views/errors/404.view.vue'
-import RadioView from "@/views/pages/radio.view.vue";
+import MusicView from "@/views/pages/music.view.vue";
 
 export const routes = [
   {
@@ -13,12 +13,12 @@ export const routes = [
     component: HomeView
   },
   {
-    path: '/radio',
-    full_name: 'Радио',
+    path: '/music',
+    full_name: 'Музыка',
     icon: 'compact-disc',
-    name: 'radio',
+    name: 'music',
     shown: true,
-    component: RadioView
+    component: MusicView
   },
   {
     path: '/:catchAll(.*)',
