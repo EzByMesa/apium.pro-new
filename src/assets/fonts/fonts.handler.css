@@ -28,6 +28,11 @@
     src: url("Montserrat/Montserrat-Regular.ttf");
 }
 
+@font-face {
+    font-family: 'Aquawax';
+    src: url("Aquawax/Aquawax-Space-Fx-Regular-trial.ttf");
+}
+
 * {
     font-family: "Montserrat", sans-serif !important;
 }

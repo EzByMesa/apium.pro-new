@@ -13,6 +13,7 @@
 import SystemBar from "@/components/app/system-bar.comp.vue"
 import { theme } from "@/store/theme.store.js"
 import { CurrentPlaying, CurrentPlayingArtwork } from "@/store/radio/current.store.js";
+import {isPlaying} from "@/store/radio/playing.store.js";
 
 export default {
   name: 'App',
@@ -24,6 +25,14 @@ export default {
     }, 1000)
   },
   computed: {
+    playing: {
+      get() {
+        return isPlaying().get()
+      },
+      set(value) {
+        isPlaying().set(value)
+      }
+    },
     theme: {
       get() {
         return theme().get()

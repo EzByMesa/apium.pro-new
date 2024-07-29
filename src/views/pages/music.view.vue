@@ -1,50 +1,49 @@
 <template>
-  <v-row>
-    <v-col cols="12" lg="4" md="6" sm="6" offset-lg="4" offset-md="3" offset-sm="3">
-      <v-sheet rounded="xl" flat class="text-center" color="transparent">
-        <v-sheet v-if="title" color="transparent" class="my-1 pa-2" id="title_holder" rounded="xl">
-          <p style="font-size: 30px; font-family: Sen, sans-serif !important;">{{ composition }} </p>
-          <p style="margin-top: -10px; font-size: 10px; font-family: Sen, sans-serif !important;" v-if="album !== composition">
-            <span class="font-weight-bold">{{ album }}</span>
-          </p>
-          <v-spacer />
-          <span style="font-size: 30px; font-family: Yeseva_One, sans-serif !important;">{{ artist }}</span>
-        </v-sheet>
-        <v-sheet v-else color="transparent" class="my-1 pa-2" rounded="xl">
-          <span style="font-size: 30px; font-family: Yeseva_One, sans-serif !important;">OFFLINE</span>
-        </v-sheet>
-      </v-sheet>
-      <v-card v-on:click="playing ? stop() : play()" v-if="title" class="my-10 d-flex justify-center align-center" :style="get_shadow()" rounded="xl" :class="playing ? 'fade' : null">
-        <v-img id="artwork" :color="artwork ? 'transparent' : 'accent'" rounded="xl" :src="artwork" cover aspect-ratio="1 / 1" width="100%" />
-        <v-fade-transition>
-          <v-sheet :color="check_is_dark(inverted2) ? '#00000033' : '#ffffff55'/*inverted2+'99'*/" class="d-flex justify-center align-center"
-                   rounded="xl" width="100%" height="100%" style="position: absolute; top: 0; left: 0; backdrop-filter: blur(20px);" v-if="leblure">
-            <v-chip style="font-size: 40px" variant="text" :color="average">
-              <span v-if="volume === 100">МАКСИМУМ</span>
-              <span v-else-if="volume > 0">ГРОМКОСТЬ {{ volume }}%</span>
-              <span v-else>ЗВУК ВЫКЛЮЧЕН</span>
-            </v-chip>
-          </v-sheet>
-        </v-fade-transition>
-      </v-card>
+  <v-sheet style="position: fixed; top: 0; left: 0;" width="100%" height="100%" :color="average" class="d-flex justify-center align-center flex-column">
+    <v-img class="artwork_bg" cover :src="artwork" width="100%" height="100%" />
 
-      <v-sheet color="transparent" class="d-flex justify-center align-center" rounded="xl" v-if="title && playing && !$vuetify.display.platform.ios">
-        <v-slider
-            v-if="playing"
-            :thumb-color="average" :disabled="muted"
-            min="0" max="100" step="1"
-            :track-color="inverted"
-            v-model="volume" hide-details
-            v-on:start="leblure = true"
-            v-on:end="leblure = false"
-        />
-
-        <v-chip v-if="playing" variant="text" :color="inverted" class="mx-2">
-          <v-icon :icon="['fas', volume === 0 || muted ? 'volume-xmark' : (volume >= 50 ? 'volume-high' : 'volume-low')]" />
-        </v-chip>
+    <v-sheet rounded="xl" flat class="text-center" color="transparent">
+      <v-sheet v-if="title" color="transparent" class="my-1 pa-2" id="title_holder" rounded="xl">
+        <p style="font-size: 30px; font-family: Aquawax, sans-serif !important;">{{ composition }}</p>
+        <p style="margin-top: -10px; font-size: 10px; font-family: Aquawax, sans-serif !important;" v-if="album !== composition">
+          <span class="font-weight-bold">{{ album }}</span>
+        </p>
+        <v-spacer />
+        <span style="font-size: 30px; font-family: Yeseva_One, sans-serif !important;">{{ artist }}</span>
       </v-sheet>
-    </v-col>
-  </v-row>
+      <v-sheet v-else color="transparent" class="my-1 pa-2" rounded="xl">
+        <span style="font-size: 30px; font-family: Yeseva_One, sans-serif !important;">OFFLINE</span>
+      </v-sheet>
+    </v-sheet>
+    <v-card :width="mobile ? '100%' : 500" color="transparent" v-on:click="playing ? stop() : play()" v-if="title" class="my-10 d-flex justify-center align-center my-colored-shadow" :rounded="mobile ? 0 : 'xl'"
+            :class="{ 'fade': playing, 'my-colored-shadow-animated': playing }"
+    >
+      <v-img id="artwork" :color="artwork ? 'transparent' : 'accent'" :rounded="mobile ? 0 : 'xl'" :src="artwork" cover aspect-ratio="1 / 1" width="100%" />
+      <v-fade-transition>
+        <v-sheet color="transparent" class="d-flex justify-center align-center"
+                 rounded="xl" width="100%" height="100%" style="position: absolute; top: 0; left: 0; backdrop-filter: blur(20px);" v-if="leblure">
+          <v-chip style="font-size: 40px" class="font-weight-bold" variant="text" :color="inverted2">
+            <span v-if="volume === 100">МАКС.</span>
+            <span v-else-if="volume > 0">
+              <v-icon style="font-size: 85%" :icon="['fas', volume === 0 || muted ? 'volume-xmark' : (volume >= 50 ? 'volume-high' : 'volume-low')]" />
+              {{ volume }}%
+            </span>
+            <span v-else>БЕЗ ЗВУКА</span>
+          </v-chip>
+        </v-sheet>
+      </v-fade-transition>
+    </v-card>
+    <v-sheet width="300" color="transparent" class="d-flex justify-center align-center" rounded="xl" v-if="title && playing && !$vuetify.display.platform.ios">
+      <v-slider
+          :thumb-color="average" :disabled="muted"
+          min="0" max="100" step="1"
+          :track-color="inverted"
+          v-model="volume" hide-details
+          v-on:start="leblure = true"
+          v-on:end="leblure = false"
+      />
+    </v-sheet>
+  </v-sheet>
 </template>
 
 
@@ -88,10 +87,6 @@ export default {
       var luma = 0.2126 * r + 0.7152 * g + 0.0722 * b; // per ITU-R BT.709
       return luma < 40 ? true : false
     },
-    focus_blur: function (event) {
-      console.log(event)
-      this.leblure = true
-    },
     update_volume: function () {
       this.source.volume = this.volume / 100
     },
@@ -111,22 +106,32 @@ export default {
       this.muted = true
       this.source.volume = 0
     },
-    unmute: function () {
-      this.muted = false
-      this.source.volume = this.volume / 100
-    },
     average_color: async function () {
       if (this.artwork) {
         this.average = await average(this.artwork)
       } else {
         this.average = null
       }
+
+      document.body.style.setProperty('--average-color', this.average)
+      document.body.style.setProperty('--inverted-color', this.inverted2)
     },
     get_shadow: function () {
-      return `box-shadow: 0px 10px 70px 0px ${this.average};`
+      return `box-shadow: 20px 50px 300px 10px ${this.average};`
     }
   },
   computed: {
+    mobile() {
+      return this.$vuetify.display.mobile
+    },
+    theme: {
+      get() {
+        return theme().get()
+      },
+      set(value) {
+        theme().set(value)
+      }
+    },
     title: {
       get() {
         return CurrentPlaying().get()
@@ -227,6 +232,49 @@ export default {
 </script>
 
 <style scoped>
+:root {
+  --average-color: #000000;
+  --inverted-color: #000000;
+}
+.average {
+  color: var(--average-color) !important;
+}
+.inverted {
+  color: var(--inverted-color) !important;
+}
+
+.artwork_bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  filter: blur(20px) opacity(0.3);
+}
+
+.my-colored-shadow {
+  box-shadow: 20px 50px 300px 10px var(--average-color);
+  transition: 0.3s;
+}
+.my-colored-shadow-animated {
+  box-shadow: 20px 50px 600px 10px var(--inverted-color);
+  transition: 0.3s;
+  animation: fade_shadow 10s ease-in-out infinite !important;
+}
+
+@keyframes fade_shadow {
+  0% {
+    box-shadow: 20px 50px 600px 10px var(--inverted-color);
+  }
+  50% {
+    box-shadow: 20px 50px 100px 10px var(--inverted-color);
+  }
+  100% {
+    box-shadow: 20px 50px 600px 10px var(--inverted-color);
+  }
+}
+
+
+
 .fade {
   animation: customAni 3s ease-in-out 0s infinite normal none;
   transition: 0.3s;

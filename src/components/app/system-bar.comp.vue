@@ -1,6 +1,8 @@
 <template>
   <template v-if="mobile">
-    <v-system-bar color="sys_bar">
+    <v-system-bar :color="($route.name === 'music' && playing) ? average : 'sys_bar'">
+      <v-list-item title="APIUM" v-if="!drawer" />
+      <v-spacer />
       <v-btn  density="compact" size="small" v-on:click="drawer = !drawer" variant="text" >
         <v-icon :icon="['fas', 'bars']" />
       </v-btn>
@@ -8,25 +10,28 @@
 
     <v-navigation-drawer location="end" v-model="drawer" temporary :width="width" color="bg">
       <v-list>
-        <v-list-item title="APIUM" :subtitle="get_prefix()" />
+        <v-list-item title="APIUM" :subtitle="get_prefix()">
+          <template v-slot:append>
+            <theme_switcher />
+          </template>
+        </v-list-item>
         <v-divider />
         <v-list-item link v-for="(route, index) in routes" :key="route"
                      :title="route.full_name.toUpperCase()"
                      v-on:click="$router.push({ name: route.name})"
         />
       </v-list>
-      <template v-slot:append>
-        <theme_switcher />
-      </template>
     </v-navigation-drawer>
   </template>
   <template v-else>
-    <v-system-bar color="sys_bar">
+    <v-system-bar :color="($route.name === 'music' && playing) ? average : 'sys_bar'">
       <theme_switcher />
-      APIUM {{ get_prefix() }}
+      <p class="font-weight-bold">APIUM {{ get_prefix() }}</p>
       <v-spacer />
       <template v-for="(route, index) in routes" :key="route">
-        <v-btn :color="$route.name === route.name ? 'accent' : 'bg'" density="compact" size="small" v-on:click="$router.push({ name: route.name})" variant="text" >
+        <v-btn :color="$route.name === route.name ? ($route.name === 'music' && playing ? inverted2 : 'accent') : 'bg'"
+               density="compact" size="small" v-on:click="$router.push({ name: route.name})" :variant="$route.name === route.name ? 'flat' : 'text'"
+        >
           {{ route.full_name.toUpperCase() }}
         </v-btn>
       </template>
@@ -81,6 +86,9 @@ export default {
     mobile() {
       return this.$vuetify.display.mobile
     },
+    get_vynil_lines: function () {
+      return `box-shadow: 20px 50px 100px 0px ${this.average};`
+    },
     width() {
       return this.$vuetify.display.width
     },
@@ -109,6 +117,10 @@ export default {
     },
     composition() {
       return this.title.split('-')[1]
+    },
+    inverted2() {
+      if (this.average) return invert(this.average)
+      return this.average
     },
     playing: {
       get() {
@@ -176,10 +188,10 @@ export default {
       -webkit-radial-gradient(
           rgba(255, 255, 255, 0) 0,
           rgba(255, 255, 255, 0) 3%,
-          rgb(255, 255, 255) 4%,
-          rgb(255, 255, 255) 21%,
-          rgb(255, 255, 255) 22%,
-          rgb(255, 255, 255) 23%,
+          rgba(255, 255, 255, 0.5) 4%,
+          rgba(255, 255, 255, 0.5)21%,
+          rgba(255, 255, 255, 0.5) 22%,
+          rgba(255, 255, 255, 0.5) 23%,
           rgba(103, 103, 103, 0.5) 24%,
           rgba(255,255,255,0) 25%,
           rgba(255,255,255,0) 40%,

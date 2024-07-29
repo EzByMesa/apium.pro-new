@@ -1,9 +1,10 @@
 <template>
-  <v-menu open-on-hover open-delay="1000">
+  <v-btn v-if="variants.length > 1" variant="plain" v-on:click="switch_theme()" :icon="true" color="theme">
+    <v-icon :icon="['fas', themes[theme].icon]" />
+  </v-btn>
+<!--  <v-menu open-on-hover open-delay="1000">
     <template v-slot:activator="{ props }">
-      <v-btn v-if="variants.length > 1" variant="plain" v-on:click="switch_theme()" :icon="true" v-bind="props" color="theme">
-        <v-icon :icon="['fas', themes[theme].icon]" />
-      </v-btn>
+
 
     </template>
 
@@ -30,13 +31,15 @@
         </v-btn>
       </template>
     </v-card>
-  </v-menu>
+  </v-menu>-->
 </template>
 
 <script>
 import { theme } from "@/store/theme.store.js"
 import { themes } from "@/plugins/themes.js";
 import { NotifyStore } from "@/store/notify.store.js";
+import {averageColor} from "@/store/radio/playing.store.js";
+import invert from "invert-color";
 
 export default {
   name: "theme_switcher",
@@ -60,8 +63,7 @@ export default {
       } else {
         NotifyStore().notify('Внимание', 'Ошибка сметы темы', 'amber', 'palette')
       }
-    },
-
+    }
   },
   computed: {
     variants() {
