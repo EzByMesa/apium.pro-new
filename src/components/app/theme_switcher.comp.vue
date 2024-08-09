@@ -36,10 +36,8 @@
 
 <script>
 import { theme } from "@/store/theme.store.js"
-import { themes } from "@/plugins/themes.js";
-import { NotifyStore } from "@/store/notify.store.js";
-import {averageColor} from "@/store/radio/playing.store.js";
-import invert from "invert-color";
+import { themes } from "@/plugins/themes.js"
+import { NotifyStore } from "@/store/notify.store.js"
 
 export default {
   name: "theme_switcher",

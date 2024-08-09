@@ -1,49 +1,37 @@
 <template>
-  <template v-if="mobile">
-    <v-system-bar :color="($route.name === 'music' && playing) ? average : 'sys_bar'">
-      <v-list-item title="APIUM" v-if="!drawer" />
-      <v-spacer />
-      <v-btn  density="compact" size="small" v-on:click="drawer = !drawer" variant="text" >
-        <v-icon :icon="['fas', 'bars']" />
-      </v-btn>
-    </v-system-bar>
+  <v-system-bar :color="($route.name === 'music' || playing) ? 'transparent' : 'sys_bar'" elevation="0" density="compact">
+    <v-btn density="compact" size="small" v-on:click="drawer = !drawer" variant="text">
+      {{ drawer ? 'МЕНЮ' : 'APIUM' }}
+    </v-btn>
+    <v-spacer />
+  </v-system-bar>
 
-    <v-navigation-drawer location="end" v-model="drawer" temporary :width="width" color="bg">
-      <v-list>
-        <v-list-item title="APIUM" :subtitle="get_prefix()">
-          <template v-slot:append>
-            <theme_switcher />
-          </template>
-        </v-list-item>
-        <v-divider />
-        <v-list-item link v-for="(route, index) in routes" :key="route"
-                     :title="route.full_name.toUpperCase()"
-                     v-on:click="$router.push({ name: route.name})"
-        />
-      </v-list>
-    </v-navigation-drawer>
-  </template>
-  <template v-else>
-    <v-system-bar :color="($route.name === 'music' && playing) ? average : 'sys_bar'">
-      <theme_switcher />
-      <p class="font-weight-bold">APIUM {{ get_prefix() }}</p>
-      <v-spacer />
-      <template v-for="(route, index) in routes" :key="route">
-        <v-btn :color="$route.name === route.name ? ($route.name === 'music' && playing ? inverted2 : 'accent') : 'bg'"
-               density="compact" size="small" v-on:click="$router.push({ name: route.name})" :variant="$route.name === route.name ? 'flat' : 'text'"
-        >
-          {{ route.full_name.toUpperCase() }}
-        </v-btn>
-      </template>
-    </v-system-bar>
-  </template>
+  <v-dialog fullscreen location="end" max-width="200" v-model="drawer" style="backdrop-filter: blur(10px) grayscale(100%)">
+    <template v-slot:default="{ isActive }">
+      <v-card rounded="0" class="text-center" title="APIUM" :subtitle="get_prefix()">
+        <v-card-text>
+          <v-btn block flat rounded="0" v-for="(route, index) in routes" :key="route"
+                       v-on:click="() => {
+                         $router.push({ name: route.name})
+                         isActive.value = false
+                       }"
+          >{{ route.full_name.toUpperCase() }}</v-btn>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <p style="font-size: 10px">APIUM MEDIA&Co. 2024</p>
+          <v-spacer />
+        </v-card-actions>
+      </v-card>
+    </template>
+  </v-dialog>
 
 
   <v-sheet
       class="current_avatar d-flex justify-space-between align-end"
       v-on:click="$router.push({name: 'music'})"
       color="transparent"
-      v-if="$route.name !== 'music' && playing"
+      v-if="$route.name !== 'music' && playing && vinyl_player"
   >
     <v-avatar :image="artwork" size="100" class="rotating" />
     <v-sheet class="pa-2" color="transparent">
@@ -59,10 +47,11 @@
 import { theme } from "@/store/theme.store.js"
 import Theme_switcher from "@/components/app/theme_switcher.comp.vue";
 import {routes} from "@/router/main.router.js";
-import {CurrentPlaying, CurrentPlayingArtwork} from "@/store/radio/current.store.js";
+import {CurrentPlayingData, CurrentPlayingArtwork} from "@/store/radio/current.store.js";
 import {averageColor, isPlaying} from "@/store/radio/playing.store.js";
 import {themes} from "@/plugins/themes.js";
 import invert from "invert-color";
+import {S__VinylPlayer} from "@/store/settings.store.js";
 
 export default {
   name: "system-bar",
@@ -77,12 +66,17 @@ export default {
       switch (this.$route.path) {
         case '/music':
           return 'РАДИО'
+        case '/settings':
+          return 'НАСТРОЙКИ'
         default:
           return null
       }
     }
   },
   computed: {
+    vinyl_player() {
+      return S__VinylPlayer().get()
+    },
     mobile() {
       return this.$vuetify.display.mobile
     },
@@ -93,23 +87,18 @@ export default {
       return this.$vuetify.display.width
     },
     inverted() {
-      if (this.average) {
-        if (themes[theme().get()].dark) {
-          return invert(this.average, { black: this.average, white: 'opposite' })
-        } else {
-          return invert(this.average, { black: 'opposite', white: this.average })
-        }
-      } return this.average
+      if (this.average) return invert(this.average)
+      return this.average
     },
     routes() {
       return routes.filter(el => el.shown === true)
     },
     title: {
       get() {
-        return CurrentPlaying().get()
+        return CurrentPlayingData().get()
       },
       set(value) {
-        CurrentPlaying().set(value)
+        CurrentPlayingData().set(value)
       }
     },
     artist() {

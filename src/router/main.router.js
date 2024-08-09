@@ -1,30 +1,24 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '@/views/pages/home.view.vue'
-import FourOFour from '@/views/errors/404.view.vue'
-import MusicView from "@/views/pages/music.view.vue";
+import ErrorPage from '@/views/error.view.vue'
+import MusicView from "@/views/pages/music.view.vue"
 
 export const routes = [
   {
     path: '/',
     full_name: 'Главная',
-    icon: 'home',
-    name: 'home',
-    shown: true,
-    component: HomeView
-  },
-  {
-    path: '/music',
-    full_name: 'Музыка',
     icon: 'compact-disc',
-    name: 'music',
+    name: 'home',
     shown: true,
     component: MusicView
   },
   {
     path: '/:catchAll(.*)',
-    name: 'error_404',
+    name: 'error_page',
+    props: {
+      error: 123
+    },
     shown: false,
-    component: FourOFour
+    component: ErrorPage
   }
 ]
 

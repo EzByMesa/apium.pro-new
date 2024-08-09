@@ -9,7 +9,7 @@ export const theme = defineStore({
         theme: Cookies.get('theme')
       }
     } else {
-      Cookies.set('theme', 'dark', { expires: 365 })
+      Cookies.set('theme', 'default', { expires: 365 })
       return {
         theme: Cookies.get('theme')
       }

@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "html-to-image": "^1.11.11",
     "invert-color": "^2.0.0",
     "vue": "^3.4.21",
     "vue3-marquee": "^4.2.0"

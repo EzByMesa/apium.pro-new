@@ -29,6 +29,14 @@ const vuetify = createVuetify({
             fa
         }
     },
+    defaults: {
+        VSheet: {
+           color: 'transparent'
+        },
+        VChip: {
+            variant: 'text'
+        }
+    },
     components,
     directives
 })

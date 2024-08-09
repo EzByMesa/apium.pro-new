@@ -1,19 +1,19 @@
 import { defineStore } from 'pinia'
 
-export const CurrentPlaying = defineStore({
+export const CurrentPlayingData = defineStore({
     id: 'current_radio_store',
     state: () => ({
-        title: null
+        data: null
     }),
     actions: {
         set(value) {
-            this.title = value
+            this.data = value
         },
         get() {
-            return this.title
+            return this.data
         },
         async reload() {
-            let url = 'https://radio.apium.pro/currentsong?sid=1'
+            let url = 'https://radio.s.apium.pro/currentsong?sid=1'
             let meta = {
                 method: 'GET'
             }
@@ -21,11 +21,9 @@ export const CurrentPlaying = defineStore({
                 .then(response => response.text())
                 .then(result => {
                     if (result !== "" && result !== null) {
-                        if (result !== this.title) {
-                            this.title = result
-                        }
+                        this.data = result
                     } else {
-                        this.title = null
+                        this.data = null
                     }
                 })
                 .catch(err => {
@@ -50,7 +48,7 @@ export const CurrentPlayingArtwork = defineStore({
             return this.artwork
         },
         async reload() {
-            const url = 'https://radio.apium.pro/playingart?sid=1'
+            const url = 'https://radio.s.apium.pro/playingart?sid=1'
             let meta = {
                 method: 'GET'
             }
