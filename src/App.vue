@@ -14,7 +14,6 @@ import { theme } from "@/store/theme.store.js"
 import { CurrentPlayingData, CurrentPlayingArtwork } from "@/store/radio/current.store.js";
 import { isPlaying } from "@/store/radio/playing.store.js";
 import logo from "@/assets/icons/logo_icon.svg"
-import ApiumLogo from "@/assets/icons/ApiumLogo.vue";
 
 export default {
   name: 'App',
@@ -26,9 +25,6 @@ export default {
     }, 1000)
   },
   computed: {
-    ApiumLogo() {
-      return ApiumLogo
-    },
     logo() {
       return logo
     },

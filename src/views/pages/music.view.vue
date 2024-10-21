@@ -1,99 +1,64 @@
 <template>
-
   <v-sheet v-if="artwork" width="100%" height="100%" :color="check_is_dark(average) ? '#595959' : '#2f2f2f'" style="position: fixed; left: 0; top: 0; z-index: -10;">
     <v-img class="artwork_bg" :class="{'paused' : !playing}" cover :src="artwork" width="100%" height="100%" style="opacity: 0.5;" />
   </v-sheet>
+  <v-sheet v-if="!artwork" width="100%" height="100%" :color="check_is_dark(average) ? '#595959' : '#2f2f2f'" style="position: fixed; left: 0; top: 0; z-index: -10;">
+    <v-img class="offline_bg" cover src="https://00.apium.pro/img/radio/bg_ofline.jpg" width="100%" height="100%" style="opacity: 0.7;" />
+  </v-sheet>
 
-  <!-- DESKTOP -->
-  <v-sheet v-if="!mobile" style="position: absolute; top: 0; left: 0; z-index: 100" width="100%" height="100%" class="d-flex justify-center align-center">
-    <v-sheet width="500" class="d-flex flex-column">
-      <v-card class="text-center" rounded="0" color="transparent" elevation="0" style="color: white !important;">
-        <template v-slot:title>
-          <span style="font-family: MontserratBD, sans-serif !important; font-size: 30px" v-if="leblure">{{ volume.toFixed(0) }}%</span>
-          <span v-else style="font-family: MontserratBD, sans-serif !important; font-size: 30px">{{ composition }}</span>
-        </template>
-        <template v-slot:subtitle>
+  <template v-if="artwork">
+    <v-sheet style="position: absolute; top: 0; left: 0; z-index: 100" width="100%" height="100%" class="d-flex justify-center align-center">
+      <v-sheet width="500" class="d-flex flex-column align-center justify-center" rounded="pill">
+        <v-progress-circular bg-color="rgba(0,0,0,0.21)" v-model="duration_perc" :color="inverted"
+                             size="400" width="200" :class="{ 'fade': playing }" v-on:click="playing ? stop() : play()">
+          <v-avatar size="398" :image="artwork" :class="{ 'fade': playing }" style="cursor: pointer; box-shadow: 4px 4px 50px 4px var(--average-color)" />
+        </v-progress-circular>
+        <v-card class="text-center" rounded="0" color="transparent" elevation="0" style="color: white !important;">
+          <template v-slot:title>
+            <span style="font-family: MontserratBD, sans-serif !important; font-size: 30px" v-if="leblure">{{ volume.toFixed(0) }}%</span>
+            <span v-else style="font-family: MontserratBD, sans-serif !important; font-size: 30px">{{ composition }}</span>
+          </template>
+          <template v-slot:subtitle>
         <span style="font-family: Montserrat, sans-serif !important; font-size: 15px">
           <span v-if="leblure">ГРОМКОСТЬ</span>
           <span v-else>{{ artist }}</span>
         </span>
-        </template>
-      </v-card>
-
-      <v-progress-circular v-model="duration_perc" :color="inverted" size="400" width="200" :class="{ 'fade': playing }">
-        <v-avatar size="390" :image="artwork">
-
-        </v-avatar>
-      </v-progress-circular>
-
-<!--      <v-sheet rounded="xl" width="510" :style="get_gradient(duration_perc)" height="510" class="d-flex justify-center align-center"
-               v-if="artwork" v-on:click="playing ? stop() : play()" :class="{ 'fade': playing }"
-               style="transition: 0.3s"
-      >
-        <v-sheet rounded="xl" width="500" height="500">
-          <v-img id="artwork" :color="artwork ? 'transparent' : 'accent'" rounded="xl" :src="artwork" cover aspect-ratio="1 / 1" width="100%" />
-        </v-sheet>
-
-&lt;!&ndash;        <v-card rounded="xl">
-
-        </v-card>&ndash;&gt;
-      </v-sheet>-->
-
-
-
-      <v-sheet width="100%" class="mb-2 px-5" v-if="playing">
-        <v-slider
-            rounded="xl"
-            :style="`opacity: ${leblure ? 1 : 0.3}; transition: 0.3s;`"
-            :track-size="5"
-            thumb-size="0"
-            min="0" max="100" step="1"
-            color="white"
-            track-color="white"
-            v-model="volume" hide-details
-            v-on:start="leblure = true"
-            v-on:end="leblure = false"
-        >
-          <template v-slot:prepend>
-            <v-chip variant="text" color="white" :style="`opacity: ${ leblure ? 1 : 0 }`">
-              <v-icon :icon="['fas', 'volume-off']" />
-            </v-chip>
           </template>
-          <template v-slot:append>
-            <v-chip variant="text" color="white" :style="`opacity: ${ leblure ? 1 : 0 }`">
-              <v-icon :icon="['fas', 'volume-up']" />
-            </v-chip>
-          </template>
-        </v-slider>
+        </v-card>
       </v-sheet>
     </v-sheet>
-  </v-sheet>
-
- <!-- MOBILE -->
-
-  <v-sheet v-else width="100%" height="100%" class="d-flex justify-space-between align-center flex-column">
-    <v-spacer />
-    <v-sheet width="80%" rounded="xl" v-on:click="playing ? stop() : play()" :class="{ 'fade': playing }">
-      <v-img
-          id="artwork" :color="artwork ? 'transparent' : 'accent'"
-          rounded="xl" :src="artwork" cover aspect-ratio="1 / 1"
-      />
-    </v-sheet>
-
-    <v-card color="transparent" flat elevation="0" class="text-center" v-if="composition && artist">
-      <template v-slot:title>
-        <span style="font-family: Yeseva_One, sans-serif !important; font-size: 30px">
-          {{ composition }}
-        </span>
-      </template>
-      <template v-slot:subtitle>
-        <span style="font-family: Montserrat, sans-serif !important; font-size: 15px">
-          {{ artist }}
-        </span>
-      </template>
-    </v-card>
-    <v-spacer />
-  </v-sheet>
+    <v-fade-transition>
+      <v-sheet width="100%" style="position: fixed; bottom: 10px" v-if="playing">
+        <v-row>
+          <v-col cols="12" md="6" xs="12" lg="4" xl="2" order-md="3" offset-lg="4" offset-xl="5">
+            <v-slider
+                rounded="xl"
+                :style="`opacity: ${leblure ? 1 : 0.3}; transition: 0.3s;`"
+                :track-size="5"
+                thumb-size="0"
+                min="0" max="100" step="1"
+                :color="inverted"
+                track-color="white"
+                v-model="volume" hide-details
+                v-on:start="leblure = true"
+                v-on:end="leblure = false"
+            >
+              <template v-slot:prepend>
+                <v-chip variant="text" :color="inverted" :style="`opacity: ${ leblure ? 1 : 0 }`">
+                  <v-icon :icon="['fas', 'volume-off']" />
+                </v-chip>
+              </template>
+              <template v-slot:append>
+                <v-chip variant="text" :color="inverted" :style="`opacity: ${ leblure ? 1 : 0 }`">
+                  <v-icon :icon="['fas', 'volume-up']" />
+                </v-chip>
+              </template>
+            </v-slider>
+          </v-col>
+        </v-row>
+      </v-sheet>
+    </v-fade-transition>
+  </template>
 </template>
 
 
@@ -390,6 +355,15 @@ export default {
   animation: bg_image_scale 20s ease-in-out 0s infinite normal none;
 }
 
+.offline_bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  filter: blur(5px) opacity(0.6);
+  animation: bg_image_scale 20s ease-in-out 0s infinite normal none;
+}
+
 @keyframes fade_shadow {
   0% {
     box-shadow: 20px 50px 600px 10px var(--inverted-color);
@@ -403,7 +377,7 @@ export default {
 }
 
 .fade {
-  animation: customAni 3s ease-in-out 0s infinite normal none;
+  animation: customAni 5s ease-in-out 0s infinite normal none;
   transition: 0.3s;
 }
 
@@ -450,3 +424,5 @@ export default {
   animation-play-state: paused;
 }
 </style>
+<script setup lang="ts">
+</script>
