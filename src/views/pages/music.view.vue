@@ -28,7 +28,7 @@
       </v-sheet>
     </v-sheet>
     <v-fade-transition>
-      <v-sheet width="100%" style="position: fixed; bottom: 10px" v-if="playing">
+      <v-sheet width="100%" style="position: fixed; z-index: 10000; bottom: 10px" v-if="playing">
         <v-row>
           <v-col cols="12" md="6" xs="12" lg="4" xl="2" order-md="3" offset-lg="4" offset-xl="5">
             <v-slider
