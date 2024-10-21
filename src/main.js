@@ -14,6 +14,7 @@ import * as directives from 'vuetify/directives'
 import '@fortawesome/fontawesome-free/css/all.css'
 import router from './router/main.router.js'
 import { themes } from "@/plugins/themes.js"
+import ApiumLogo from "@/assets/icons/ApiumLogo.vue";
 
 
 library.add(fas, far, fab)
@@ -27,7 +28,12 @@ const vuetify = createVuetify({
         aliases,
         sets: {
             fa
-        }
+        },
+        values: {
+            apium: {
+                component: ApiumLogo
+            }
+        },
     },
     defaults: {
         VSheet: {

@@ -29,6 +29,11 @@
 }
 
 @font-face {
+    font-family: 'MontserratBD';
+    src: url("Montserrat/Montserrat-Bold.ttf");
+}
+
+@font-face {
     font-family: 'Aquawax';
     src: url("Aquawax/Aquawax-Space-Fx-Regular-trial.ttf");
 }

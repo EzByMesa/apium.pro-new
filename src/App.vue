@@ -13,6 +13,8 @@ import SystemBar from "@/components/app/system-bar.comp.vue"
 import { theme } from "@/store/theme.store.js"
 import { CurrentPlayingData, CurrentPlayingArtwork } from "@/store/radio/current.store.js";
 import { isPlaying } from "@/store/radio/playing.store.js";
+import logo from "@/assets/icons/logo_icon.svg"
+import ApiumLogo from "@/assets/icons/ApiumLogo.vue";
 
 export default {
   name: 'App',
@@ -24,6 +26,12 @@ export default {
     }, 1000)
   },
   computed: {
+    ApiumLogo() {
+      return ApiumLogo
+    },
+    logo() {
+      return logo
+    },
     artwork: {
       get() {
         return CurrentPlayingArtwork().get()
@@ -58,6 +66,13 @@ export default {
 @import "assets/play_pause.style.css";
 * {
   transition: 0.3s
+}
+
+.apium-logo {
+  position: fixed;
+  top: 100px;
+  left: 100px;
+  z-index: 5000;
 }
 
 ::-webkit-scrollbar {

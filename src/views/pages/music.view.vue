@@ -1,88 +1,72 @@
 <template>
 
-<!--  <v-sheet v-if="!current_data" class="my-1 pa-2" rounded="xl">
-    <span style="font-size: 30px; font-family: Yeseva_One, sans-serif !important;">OFFLINE</span>
-  </v-sheet>-->
-
-  <v-sheet width="100%" height="100%" :color="average" style="position: fixed; left: 0; top: 0; z-index: -10;">
-    <v-img v-if="artwork" class="artwork_bg" cover :src="artwork" width="100%" height="100%" />
+  <v-sheet v-if="artwork" width="100%" height="100%" :color="check_is_dark(average) ? '#595959' : '#2f2f2f'" style="position: fixed; left: 0; top: 0; z-index: -10;">
+    <v-img class="artwork_bg" :class="{'paused' : !playing}" cover :src="artwork" width="100%" height="100%" style="opacity: 0.5;" />
   </v-sheet>
-
-  <v-sheet class="duration_indicator border-b-lg" width="100%" :height="duration_perc+'%'" rounded="0" />
 
   <!-- DESKTOP -->
   <v-sheet v-if="!mobile" style="position: absolute; top: 0; left: 0; z-index: 100" width="100%" height="100%" class="d-flex justify-center align-center">
-    <v-hover>
-      <template v-slot:default="{ isHovering, props }">
-        <v-card
-            elevation="0"
-            v-bind="props" width="500" :color="average"
-            v-if="current_data"
-            class="my-10 d-flex justify-center align-center my-colored-shadow"
-            rounded="xl" :class="{ 'fade': playing }"
-        >
+    <v-sheet width="500" class="d-flex flex-column">
+      <v-card class="text-center" rounded="0" color="transparent" elevation="0" style="color: white !important;">
+        <template v-slot:title>
+          <span style="font-family: MontserratBD, sans-serif !important; font-size: 30px" v-if="leblure">{{ volume.toFixed(0) }}%</span>
+          <span v-else style="font-family: MontserratBD, sans-serif !important; font-size: 30px">{{ composition }}</span>
+        </template>
+        <template v-slot:subtitle>
+        <span style="font-family: Montserrat, sans-serif !important; font-size: 15px">
+          <span v-if="leblure">ГРОМКОСТЬ</span>
+          <span v-else>{{ artist }}</span>
+        </span>
+        </template>
+      </v-card>
+
+      <v-progress-circular v-model="duration_perc" :color="inverted" size="400" width="200" :class="{ 'fade': playing }">
+        <v-avatar size="390" :image="artwork">
+
+        </v-avatar>
+      </v-progress-circular>
+
+<!--      <v-sheet rounded="xl" width="510" :style="get_gradient(duration_perc)" height="510" class="d-flex justify-center align-center"
+               v-if="artwork" v-on:click="playing ? stop() : play()" :class="{ 'fade': playing }"
+               style="transition: 0.3s"
+      >
+        <v-sheet rounded="xl" width="500" height="500">
           <v-img id="artwork" :color="artwork ? 'transparent' : 'accent'" rounded="xl" :src="artwork" cover aspect-ratio="1 / 1" width="100%" />
-          <v-fade-transition>
-            <v-sheet color="transparent"
-                     rounded="xl" width="100%" height="100%" style="position: absolute; top: 0; left: 0; backdrop-filter: blur(20px);" v-if="isHovering">
-              <v-sheet  class="d-flex justify-center align-center flex-column" style="position: relative" width="100%" height="100%">
-                <v-sheet rounded="xl" width="100%" flat style="position: absolute; top:0; z-index: 5000;">
-                  <v-card class="text-center" rounded="0" color="transparent" elevation="0">
-                    <template v-slot:title>
-                      <span>
-                        <span style="font-family: Yeseva_One, sans-serif !important; font-size: 30px" v-if="leblure && isHovering">{{ volume }}%</span>
-                        <span v-else style="font-family: Yeseva_One, sans-serif !important; font-size: 30px">{{ composition }}</span>
-                      </span>
-                    </template>
-                    <template v-slot:subtitle>
-                      <span style="font-family: Montserrat, sans-serif !important; font-size: 15px">
-                        <span v-if="leblure && isHovering">ГРОМКОСТЬ</span>
-                        <span v-else>{{ artist }}</span>
-                      </span>
-                    </template>
-                  </v-card>
-                </v-sheet>
+        </v-sheet>
 
-                <div class="my-play-btn" v-on:click="playing ? stop() : play()" :class="{ 'active' : playing }" >
-                  <div class="my-play-btn-bg" x="0" y="0" width="200" height="200" />
-                  <div class="my-play-btn-icon" width="200" height="200">
-                    <div class="parte my-play-btn-pause" x="0" y="0" width="200" height="200" fill="#fff" />
-                    <div class="parte my-play-btn-play" x="0" y="0" width="200" height="200" fill="#fff" />
-                  </div>
-                  <div class="puntero" />
-                </div>
+&lt;!&ndash;        <v-card rounded="xl">
 
-                <v-spacer v-if="playing" />
-                <v-sheet width="100%" class="mb-2 px-5" v-if="playing">
-                  <v-slider
-                      rounded="xl"
-                      track-size="20"
-                      thumb-size="0"
-                      min="0" max="100" step="1"
-                      :color="inverted"
-                      :track-color="inverted"
-                      v-model="volume" hide-details
-                      v-on:start="leblure = true"
-                      v-on:end="leblure = false"
-                  >
-                    <template v-slot:prepend>
-                      <v-chip variant="text">
-                        <v-icon :icon="['fas', 'volume-off']" />
-                      </v-chip>
-                    </template>
-                    <template v-slot:append>
-                      <v-chip variant="text">
-                        <v-icon :icon="['fas', 'volume-up']" />
-                      </v-chip>
-                    </template>
-                  </v-slider>
-                </v-sheet>
-              </v-sheet>
-            </v-sheet>
-          </v-fade-transition>
-        </v-card>
-      </template>
-    </v-hover>
+        </v-card>&ndash;&gt;
+      </v-sheet>-->
+
+
+
+      <v-sheet width="100%" class="mb-2 px-5" v-if="playing">
+        <v-slider
+            rounded="xl"
+            :style="`opacity: ${leblure ? 1 : 0.3}; transition: 0.3s;`"
+            :track-size="5"
+            thumb-size="0"
+            min="0" max="100" step="1"
+            color="white"
+            track-color="white"
+            v-model="volume" hide-details
+            v-on:start="leblure = true"
+            v-on:end="leblure = false"
+        >
+          <template v-slot:prepend>
+            <v-chip variant="text" color="white" :style="`opacity: ${ leblure ? 1 : 0 }`">
+              <v-icon :icon="['fas', 'volume-off']" />
+            </v-chip>
+          </template>
+          <template v-slot:append>
+            <v-chip variant="text" color="white" :style="`opacity: ${ leblure ? 1 : 0 }`">
+              <v-icon :icon="['fas', 'volume-up']" />
+            </v-chip>
+          </template>
+        </v-slider>
+      </v-sheet>
+    </v-sheet>
   </v-sheet>
 
  <!-- MOBILE -->
@@ -96,7 +80,7 @@
       />
     </v-sheet>
 
-    <v-card color="transparent" flat elevation="0" class="text-center">
+    <v-card color="transparent" flat elevation="0" class="text-center" v-if="composition && artist">
       <template v-slot:title>
         <span style="font-family: Yeseva_One, sans-serif !important; font-size: 30px">
           {{ composition }}
@@ -143,14 +127,21 @@ export default {
     },
   },
   methods: {
+    get_gradient: function (progress) {
+      return `background: conic-gradient(${'rgba(197,197,197,0.4)'} 0% ${progress}%, ${'rgba(255,255,255,0)'} ${progress}% 100%) !important`
+    },
     check_is_dark: function (color) {
-      var c = color.substring(1);      // strip #
-      var rgb = parseInt(c, 16);   // convert rrggbb to decimal
-      var r = (rgb >> 16) & 0xff;  // extract red
-      var g = (rgb >>  8) & 0xff;  // extract green
-      var b = (rgb >>  0) & 0xff;  // extract blue
-      var luma = 0.2126 * r + 0.7152 * g + 0.0722 * b; // per ITU-R BT.709
-      return luma < 40 ? true : false
+      if(color) {
+        var c = color.substring(1);      // strip #
+        var rgb = parseInt(c, 16);   // convert rrggbb to decimal
+        var r = (rgb >> 16) & 0xff;  // extract red
+        var g = (rgb >>  8) & 0xff;  // extract green
+        var b = (rgb >>  0) & 0xff;  // extract blue
+        var luma = 0.2126 * r + 0.7152 * g + 0.0722 * b; // per ITU-R BT.709
+        return luma < 40 ? true : false
+      } else {
+        return null
+      }
     },
     update_volume: function () {
       this.source.volume = this.volume / 100
@@ -364,7 +355,6 @@ export default {
 </script>
 
 <style scoped>
-
 .my-colored-shadow {
   animation: fade_shadow 13s ease-in-out 0s infinite normal none;
 }
@@ -384,8 +374,6 @@ export default {
   color: var(--inverted-color);
 }
 
-
-
 .average {
   color: var(--average-color) !important;
 }
@@ -398,7 +386,7 @@ export default {
   top: 0;
   left: 0;
   z-index: -1;
-  filter: blur(40px) opacity(0.6);
+  filter: blur(20px) opacity(0.6);
   animation: bg_image_scale 20s ease-in-out 0s infinite normal none;
 }
 
@@ -423,11 +411,9 @@ export default {
   0% {
     transform: scale(1);
   }
-
   50% {
     transform: scale(0.95);
   }
-
   100% {
     transform: scale(1);
   }
@@ -435,13 +421,21 @@ export default {
 
 @keyframes bg_image_scale {
   0% {
-    transform: scale(1);
+    transform: scale(1.3);
+    rotate: 0deg;
+  }
+  25% {
+    rotate: -10deg;
   }
   50% {
-    transform: scale(1.3);
+    transform: scale(1.7);
+  }
+  75% {
+    rotate: 10deg;
   }
   100% {
-    transform: scale(1);
+    transform: scale(1.3);
+    rotate: 0deg;
   }
 }
 
@@ -450,6 +444,9 @@ export default {
   top: 0;
   left:0;
   z-index: -1;
-  background: linear-gradient(90deg, rgba(131,58,180,0.1) 0%, rgba(253,29,29,0.1) 50%, rgba(252,176,69,0.1) 100%) !important;
+}
+
+.paused {
+  animation-play-state: paused;
 }
 </style>
