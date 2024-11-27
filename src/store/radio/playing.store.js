@@ -74,3 +74,18 @@ export const averageColor = defineStore({
         }
     }
 })
+
+export const paletteColors = defineStore({
+    id: 'palette_radio_store',
+    state: () => ({
+        palette: null
+    }),
+    actions: {
+        set(value) {
+            this.palette = value
+        },
+        get() {
+            return this.palette
+        }
+    }
+})

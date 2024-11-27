@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import ErrorPage from '@/views/error.view.vue'
-import MusicView from "@/views/pages/music.view.vue"
+import MusicView from "@/views/home.view.vue"
 
 export const routes = [
   {

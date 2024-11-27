@@ -1,19 +1,28 @@
 <template>
-  <v-sheet v-if="artwork" width="100%" height="100%" :color="check_is_dark(average) ? '#595959' : '#2f2f2f'" style="position: fixed; left: 0; top: 0; z-index: -10;">
+  <v-sheet v-if="artwork" width="100%" height="100%" :color="inverted" style="position: fixed; left: 0; top: 0; z-index: -10;">
     <v-img class="artwork_bg" :class="{'paused' : !playing}" cover :src="artwork" width="100%" height="100%" style="opacity: 0.5;" />
   </v-sheet>
-  <v-sheet v-if="!artwork" width="100%" height="100%" :color="check_is_dark(average) ? '#595959' : '#2f2f2f'" style="position: fixed; left: 0; top: 0; z-index: -10;">
+  <v-sheet v-if="!artwork" width="100%" height="100%" style="position: fixed; left: 0; top: 0; z-index: -10;">
     <v-img class="offline_bg" cover src="https://00.apium.pro/img/radio/bg_ofline.jpg" width="100%" height="100%" style="opacity: 0.7;" />
   </v-sheet>
 
+  <v-sheet :style="`mix-blend-mode: color-burn;`" style="position: fixed; z-index: -1; filter: blur(50px);" :color="average" width="100%" height="500%" class="d-flex justify-space-between rotating_gradient">
+    <v-sheet style="transition: 5s; opacity: 1" width="100%" v-for="color in palette" rounded="0" :color="translate_color(color)"  />
+  </v-sheet>
+
+
   <template v-if="artwork">
     <v-sheet style="position: absolute; top: 0; left: 0; z-index: 100" width="100%" height="100%" class="d-flex justify-center align-center">
-      <v-sheet width="500" class="d-flex flex-column align-center justify-center" rounded="pill">
-        <v-progress-circular bg-color="rgba(0,0,0,0.21)" v-model="duration_perc" :color="inverted"
-                             size="400" width="200" :class="{ 'fade': playing }" v-on:click="playing ? stop() : play()">
-          <v-avatar size="398" :image="artwork" :class="{ 'fade': playing }" style="cursor: pointer; box-shadow: 4px 4px 50px 4px var(--average-color)" />
-        </v-progress-circular>
-        <v-card class="text-center" rounded="0" color="transparent" elevation="0" style="color: white !important;">
+      <v-sheet class="d-flex flex-column align-center justify-center">
+        <v-sheet v-on:click="playing ? stop() : play()" :class="{ 'fade': playing }" style="cursor: pointer;" >
+          <v-avatar id="title_cover" rounded="lg" :size="mobile ? 350 : 600" :image="artwork" :style="`box-shadow: 4px 4px 50px 4px var(${leblure ? '--inverted-color' : '--average-color'})`" />
+          <v-fade-transition>
+            <ProgressBG v-if="playing" :percent="duration_perc" :color="inverted" />
+          </v-fade-transition>
+        </v-sheet>
+
+
+        <v-card class="text-center mt-4" rounded="0" color="transparent" elevation="0" style="color: white !important;">
           <template v-slot:title>
             <span style="font-family: MontserratBD, sans-serif !important; font-size: 30px" v-if="leblure">{{ volume.toFixed(0) }}%</span>
             <span v-else style="font-family: MontserratBD, sans-serif !important; font-size: 30px">{{ composition }}</span>
@@ -28,7 +37,7 @@
       </v-sheet>
     </v-sheet>
     <v-fade-transition>
-      <v-sheet width="100%" style="position: fixed; z-index: 10000; bottom: 10px" v-if="playing">
+      <v-sheet width="100%" style="position: fixed; z-index: 10000; bottom: 10px" v-if="playing & !mobile">
         <v-row>
           <v-col cols="12" md="6" xs="12" lg="4" xl="2" order-md="3" offset-lg="4" offset-xl="5">
             <v-slider
@@ -67,10 +76,13 @@ import { CurrentPlayingData, CurrentPlayingArtwork } from "@/store/radio/current
 import { average } from "@/libs/average.js"
 import invert from 'invert-color'
 import { theme } from "@/store/theme.store.js"
-import { averageColor, isMuted, isPlaying, musicVolume, radioSource } from "@/store/radio/playing.store.js"
+import {averageColor, isMuted, isPlaying, musicVolume, paletteColors, radioSource} from "@/store/radio/playing.store.js"
+import ProgressBG from "@/components/app/progress.component.vue";
+import { cover_palette } from "@/libs/palette.js";
 
 export default {
   name: 'MusicView',
+  components: {ProgressBG},
   data() {
     return {
       leblure: false,
@@ -92,8 +104,9 @@ export default {
     },
   },
   methods: {
-    get_gradient: function (progress) {
-      return `background: conic-gradient(${'rgba(197,197,197,0.4)'} 0% ${progress}%, ${'rgba(255,255,255,0)'} ${progress}% 100%) !important`
+    translate_color: function (color) {
+      if (color && color.r && color.g && color.b) return `rgb(${color.r}, ${color.g}, ${color.b})`
+      return 'black'
     },
     check_is_dark: function (color) {
       if(color) {
@@ -134,6 +147,8 @@ export default {
         this.media_player_handler()
 
         this.average = await average(this.artwork)
+        this.palette = await cover_palette(this.artwork)
+
       } else {
         this.average = null
       }
@@ -174,11 +189,15 @@ export default {
     }
   },
   computed: {
-    artwork_height() {
-      return document.getElementById('artwork').offsetHeight
-    },
-    text_color() {
-      return this.check_is_dark(this.average) ? '#ffffff' : '#000000'
+    segments() {
+      return {
+        top_right:  this.duration_perc > 12.5 ? 100 : 100 * (0 - this.duration_perc) / (0 - 12.5) < 0 ? 0 : 100 * (0 - this.duration_perc) / (0 - 12.5),
+        right:      this.duration_perc > 37.5 ? 100 : 100 * (12.6 - this.duration_perc) / (12.6 - 37.5) < 0 ? 0 : 100 * (12.6 - this.duration_perc) / (12.6 - 37.5),
+        bottom:     this.duration_perc > 62.5 ? 100 : 100 * (37.6 - this.duration_perc) / (37.6 - 62.5) < 0 ? 0 : 100 * (37.6 - this.duration_perc) / (37.6 - 62.5),
+        left:       this.duration_perc > 87.5 ? 100 : 100 * (62.6 - this.duration_perc) / (62.6 - 87.5) < 0 ? 0 : 100 * (62.6 - this.duration_perc) / (62.6 - 87.5),
+        top_left:   this.duration_perc > 100 ? 100 : 100 * (87.6 - this.duration_perc) / (87.6 - 100) < 0 ? 0 : 100 * (87.6 - this.duration_perc) / (87.6 - 100),
+      }
+
     },
     mobile() {
       return this.$vuetify.display.mobile
@@ -263,10 +282,6 @@ export default {
       }
       return this.average
     },
-    favicon() {
-
-
-    },
     artwork: {
       get() {
         return CurrentPlayingArtwork().get()
@@ -289,6 +304,14 @@ export default {
       },
       set(value) {
         averageColor().set(value)
+      }
+    },
+    palette: {
+      get() {
+        return paletteColors().get()
+      },
+      set(value) {
+        paletteColors().set(value)
       }
     },
     muted: {
@@ -351,7 +374,7 @@ export default {
   top: 0;
   left: 0;
   z-index: -1;
-  filter: blur(20px) opacity(0.6);
+  filter: blur(30px) opacity(0.6);
   animation: bg_image_scale 20s ease-in-out 0s infinite normal none;
 }
 
@@ -386,7 +409,7 @@ export default {
     transform: scale(1);
   }
   50% {
-    transform: scale(0.95);
+    transform: scale(0.97);
   }
   100% {
     transform: scale(1);
@@ -423,6 +446,16 @@ export default {
 .paused {
   animation-play-state: paused;
 }
+
+.rotating_gradient {
+  animation: spin 120s linear infinite;
+}
+
+@keyframes spin {
+  100% {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+
 </style>
-<script setup lang="ts">
-</script>

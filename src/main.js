@@ -44,6 +44,8 @@ const vuetify = createVuetify({
 const Vue = createApp(App)
 const pinia = createPinia()
 
+Vue.config.ignoredElements = [ 'css-doodle' ];
+
 Vue.use(router)
 Vue.use(pinia)
 Vue.use(vuetify)

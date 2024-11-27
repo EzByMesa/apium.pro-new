@@ -11,8 +11,8 @@
     position: fixed;
     top: 0;
     left: 0;
-    z-index: -1;
-    filter: blur(20px) opacity(0.6);
+    z-index: -2;
+    filter: blur(0) opacity(1);
     animation: bg_image_scale 20s ease-in-out 0s infinite normal none;
 }
 
