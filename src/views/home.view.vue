@@ -7,7 +7,13 @@
   </v-sheet>
 
   <v-sheet :style="`mix-blend-mode: color-burn;`" style="position: fixed; z-index: -1; filter: blur(50px);" :color="average" width="100%" height="500%" class="d-flex justify-space-between rotating_gradient">
-    <v-sheet style="transition: 5s; opacity: 1" width="100%" v-for="color in palette" rounded="0" :color="translate_color(color)"  />
+    <v-sheet style="transition: 5s; opacity: 1" width="100%" v-for="color in palette" rounded="0" :color="color"  />
+  </v-sheet>
+
+  <v-sheet style="position: fixed; top: 0; left: 0;" color="white">
+    <v-avatar v-for="color in palette" :color="color" />
+    <v-divider />
+    <v-avatar v-for="color in prepared_palette(palette).palette" :color="color" />
   </v-sheet>
 
 
@@ -79,6 +85,7 @@ import { theme } from "@/store/theme.store.js"
 import {averageColor, isMuted, isPlaying, musicVolume, paletteColors, radioSource} from "@/store/radio/playing.store.js"
 import ProgressBG from "@/components/app/progress.component.vue";
 import { cover_palette } from "@/libs/palette.js";
+import { prepared_palette } from "@/libs/color.js";
 
 export default {
   name: 'MusicView',
@@ -104,10 +111,7 @@ export default {
     },
   },
   methods: {
-    translate_color: function (color) {
-      if (color && color.r && color.g && color.b) return `rgb(${color.r}, ${color.g}, ${color.b})`
-      return 'black'
-    },
+    prepared_palette,
     check_is_dark: function (color) {
       if(color) {
         var c = color.substring(1);      // strip #
@@ -158,7 +162,7 @@ export default {
     },
     media_player_handler: function () {
       if (this.playing) {
-        document.title = `${this.composition} - ${this.artist}`
+        document.title = `${this.composition} ■ ${this.artist}`
       } else {
         document.title = `APIUM RADIO`
       }
