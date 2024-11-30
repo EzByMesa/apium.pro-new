@@ -1,17 +1,9 @@
 export function prepared_palette(color_array) {
 
     if (color_array) {
-        return {
-            brighten:   color_array[color_array.length-1],
-            darken:     color_array[0],
-            palette:    crop_palette(color_array)
-        }
+        return  crop_palette(color_array)
     } else {
-        return {
-            brighten:   '#fff',
-            darken:     '#000',
-            palette:    []
-        }
+        return []
     }
 
 
@@ -19,19 +11,26 @@ export function prepared_palette(color_array) {
 
 export function crop_palette(array) {
     let arr = JSON.parse(JSON.stringify(array))
-
     for (let i = 0; i < arr.length; i++) {
+        let compare = []
         for (let j = i+1; j < arr.length; j++) {
             let el_A = hexToRgbArray(arr[i])
             let el_B = hexToRgbArray(arr[j])
 
-            if (deltaE(el_A, el_B) < 10) {
-                console.log(arr[i], ': ', arr[j])
-                //arr.splice(arr[j], 1)
+            if (deltaE(el_A, el_B) < 20) {
+                compare.push(arr[j])
             }
         }
-        arr = JSON.parse(JSON.stringify(arr))
+        for (let color of compare) {
+            arr.splice(arr.indexOf(color), 1)
+        }
     }
+
+
+
+
+
+
     return arr
 }
 

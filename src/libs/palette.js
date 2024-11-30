@@ -1,3 +1,5 @@
+import {prepared_palette} from "@/libs/color.js";
+
 const buildRgb = (imageData) => {
     const rgbValues = [];
     // note that we are loopin every 4!
@@ -128,8 +130,7 @@ export function cover_palette(src) {
                 colors.push("#" + componentToHex(color.r) + componentToHex(color.g) + componentToHex(color.b))
             }
 
-
-            resolve(colors)
+            resolve(prepared_palette(colors))
         }
     })
 }

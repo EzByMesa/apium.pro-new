@@ -1,19 +1,11 @@
 <template>
-  <v-sheet v-if="artwork" width="100%" height="100%" :color="inverted" style="position: fixed; left: 0; top: 0; z-index: -10;">
+  <v-sheet :color="palette[palette.length-1]" v-if="artwork && palette" width="100%" height="100%" style="position: fixed; left: 0; top: 0; z-index: -10;">
     <v-img class="artwork_bg" :class="{'paused' : !playing}" cover :src="artwork" width="100%" height="100%" style="opacity: 0.5;" />
   </v-sheet>
+
+  <WeveComp />
   <v-sheet v-if="!artwork" width="100%" height="100%" style="position: fixed; left: 0; top: 0; z-index: -10;">
     <v-img class="offline_bg" cover src="https://00.apium.pro/img/radio/bg_ofline.jpg" width="100%" height="100%" style="opacity: 0.7;" />
-  </v-sheet>
-
-  <v-sheet :style="`mix-blend-mode: color-burn;`" style="position: fixed; z-index: -1; filter: blur(50px);" :color="average" width="100%" height="500%" class="d-flex justify-space-between rotating_gradient">
-    <v-sheet style="transition: 5s; opacity: 1" width="100%" v-for="color in palette" rounded="0" :color="color"  />
-  </v-sheet>
-
-  <v-sheet style="position: fixed; top: 0; left: 0;" color="white">
-    <v-avatar v-for="color in palette" :color="color" />
-    <v-divider />
-    <v-avatar v-for="color in prepared_palette(palette).palette" :color="color" />
   </v-sheet>
 
 
@@ -21,7 +13,7 @@
     <v-sheet style="position: absolute; top: 0; left: 0; z-index: 100" width="100%" height="100%" class="d-flex justify-center align-center">
       <v-sheet class="d-flex flex-column align-center justify-center">
         <v-sheet v-on:click="playing ? stop() : play()" :class="{ 'fade': playing }" style="cursor: pointer;" >
-          <v-avatar id="title_cover" rounded="lg" :size="mobile ? 350 : 600" :image="artwork" :style="`box-shadow: 4px 4px 50px 4px var(${leblure ? '--inverted-color' : '--average-color'})`" />
+          <v-avatar id="title_cover" rounded="lg" :size="mobile ? 350 : 600" :image="artwork" :style="`box-shadow: 4px 4px 60px 4px var(--lighten-color)`" />
           <v-fade-transition>
             <ProgressBG v-if="playing" :percent="duration_perc" :color="inverted" />
           </v-fade-transition>
@@ -86,10 +78,11 @@ import {averageColor, isMuted, isPlaying, musicVolume, paletteColors, radioSourc
 import ProgressBG from "@/components/app/progress.component.vue";
 import { cover_palette } from "@/libs/palette.js";
 import { prepared_palette } from "@/libs/color.js";
+import WeveComp from "@/components/app/wave.comp.vue";
 
 export default {
   name: 'MusicView',
-  components: {ProgressBG},
+  components: {WeveComp, ProgressBG},
   data() {
     return {
       leblure: false,
@@ -156,6 +149,16 @@ export default {
       } else {
         this.average = null
       }
+
+      if (this.palette && this.palette.length > 0) {
+        document.body.style.setProperty('--darken-color', this.palette[0])
+        document.body.style.setProperty('--lighten-color', this.palette[this.palette.length -1])
+      } else {
+        document.body.style.setProperty('--darken-color', '#000')
+        document.body.style.setProperty('--lighten-color', '#fff')
+      }
+
+
 
       document.body.style.setProperty('--average-color', this.average)
       document.body.style.setProperty('--inverted-color', this.inverted)
