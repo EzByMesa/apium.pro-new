@@ -142,4 +142,16 @@ function componentToHex(c) {
 }
 
 
+export function md(arr){
+
+    let i=0,
+        j=i+2;
+    while(arr[j] !=null){
+        i++;
+        j=i+2;
+    }
+
+    return arr[i]
+}
+
 

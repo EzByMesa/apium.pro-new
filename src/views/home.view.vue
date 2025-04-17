@@ -1,10 +1,101 @@
 <template>
   <v-sheet :color="palette[palette.length-1]" v-if="artwork && palette" width="100%" height="100%" style="position: fixed; left: 0; top: 0; z-index: -10;">
-    <v-img class="artwork_bg" :class="{'paused' : !playing}" cover :src="artwork" width="100%" height="100%" style="opacity: 0.5;" />
+<!--    <v-img class="artwork_bg" :class="{'paused' : !playing}" cover :src="artwork" width="100%" height="100%" style="opacity: 0.5;" />-->
+  </v-sheet>
+  <WeveComp :average="inverted" :playing="playing" v-if="artwork && palette"  />
+  <v-sheet
+      width="100%"
+      class="pa-2 mt-2 d-flex justify-center align-center flex-column"
+      rounded="xl"
+      style="transition: 0.5s; position: absolute; top: 0; right: 0"
+      :style="`filter: blur(${ !playing ? '0' : '30px' }); display: ${ !playing ? '1' : '0' };`"
+  >
+    <p :style="`filter: blur(${ !playing ? '0' : '10px' }); opacity: ${ !playing ? '1' : '0' }`" style="transition: 1s">
+      <span style="font-family: MontserratBD, sans-serif !important; font-size: 60px">APIUM RADIO</span>
+    </p>
+  </v-sheet>
+  <v-sheet rounded="xl" class="text-center" v-if="artwork">
+    <v-sheet style="position: relative">
+      <v-avatar
+          elevation="10"
+          rounded="xl"
+          :class="{'my-track-cover' :  playing}"
+
+          :style="`filter: grayscale(${ playing ? '0' : '1' });`"
+          style="cursor: pointer; transition: 0.5s;"
+
+          size="500"
+          :image="artwork"
+
+          v-on:click="playing ? stop() : play()"
+      />
+      <v-fade-transition>
+        <v-sheet v-if="!playing"
+                 style="pointer-events: none; backdrop-filter: blur(8px) brightness(0.3); position: absolute; top: 0; left: 0; z-index: 4000;"
+                 rounded="xl" width="100%" height="100%" color="transparent"
+                 class="d-flex text-center align-center justify-center"
+                 :style="`background: radial-gradient(var(--average-color), rgba(0,0,0,0)); scale: ${!playing ? 1.06 : 1}`"
+        >
+          <p style="font-size: 60px; font-family: MontserratBD, sans-serif !important;">
+            PLAY
+            <v-icon class="ml-2" :icon="['fas', 'play']" />
+          </p>
+        </v-sheet>
+      </v-fade-transition>
+
+    </v-sheet>
+
+
+    <v-sheet
+        width="100%"
+        v-on:mouseenter="show_volume = true"
+        v-on:mouseleave="show_volume = false"
+        class="pa-2 mb-2 mt-2 d-flex justify-center align-center flex-column"
+        rounded="xl"
+         style="transition: 0.5s; position: absolute; bottom: 0; right: 0"
+        :style="`filter: blur(${ playing ? '0' : '30px' }); display: ${ playing ? '1' : '0' };`"
+    >
+      <p :style="`filter: blur(${ playing ? '0' : '10px' }); opacity: ${ playing ? '1' : '0' }`" style="transition: 0.9s">
+        <span v-if="leblure" style="font-family: MontserratBD, sans-serif !important; font-size: 60px">{{ volume.toFixed(0) }}%</span>
+        <span v-else style="font-family: MontserratBD, sans-serif !important; font-size: 60px">{{ composition }}</span>
+      </p>
+      <p :style="`filter: blur(${ playing ? '0' : '10px' }); opacity: ${ playing ? '1' : '0' }`" style="font-family: Montserrat, sans-serif !important; font-size: 20px; transition: 2s !important">
+        <span v-if="leblure">ГРОМКОСТЬ</span>
+        <span v-else>{{ artist }}</span>
+      </p>
+
+      <v-expand-transition>
+        <v-sheet width="400" v-if="show_volume">
+          <v-slider
+              rounded="xl"
+              :style="`opacity: ${leblure ? 1 : 0.3}; transition: 0.3s;`"
+              :track-size="5"
+              thumb-size="0"
+              min="0" max="100" step="1"
+              :color="md(palette)"
+              track-color="white"
+              v-model="volume" hide-details
+              v-on:start="leblure = true"
+              v-on:end="leblure = false"
+          >
+            <template v-slot:prepend>
+              <v-chip variant="text" :color="inverted" :style="`opacity: ${ leblure ? 1 : 0 }`">
+                <v-icon :icon="['fas', 'volume-off']" />
+              </v-chip>
+            </template>
+            <template v-slot:append>
+              <v-chip variant="text" :color="inverted" :style="`opacity: ${ leblure ? 1 : 0 }`">
+                <v-icon :icon="['fas', 'volume-up']" />
+              </v-chip>
+            </template>
+          </v-slider>
+        </v-sheet>
+
+      </v-expand-transition>
+    </v-sheet>
   </v-sheet>
 
-  <WeveComp />
-  <v-sheet v-if="!artwork" width="100%" height="100%" style="position: fixed; left: 0; top: 0; z-index: -10;">
+  <!--<v-sheet v-if="!artwork" width="100%" height="100%" style="position: fixed; left: 0; top: 0; z-index: -10;">
     <v-img class="offline_bg" cover src="https://00.apium.pro/img/radio/bg_ofline.jpg" width="100%" height="100%" style="opacity: 0.7;" />
   </v-sheet>
 
@@ -13,10 +104,10 @@
     <v-sheet style="position: absolute; top: 0; left: 0; z-index: 100" width="100%" height="100%" class="d-flex justify-center align-center">
       <v-sheet class="d-flex flex-column align-center justify-center">
         <v-sheet v-on:click="playing ? stop() : play()" :class="{ 'fade': playing }" style="cursor: pointer;" >
-          <v-avatar id="title_cover" rounded="lg" :size="mobile ? 350 : 600" :image="artwork" :style="`box-shadow: 4px 4px 60px 4px var(--lighten-color)`" />
-          <v-fade-transition>
+          <v-avatar id="title_cover" rounded="xl" :size="mobile ? 350 : 600" :image="artwork" :style="`box-shadow: 4px 4px 60px 4px var(&#45;&#45;lighten-color)`" />
+&lt;!&ndash;          <v-fade-transition>
             <ProgressBG v-if="playing" :percent="duration_perc" :color="inverted" />
-          </v-fade-transition>
+          </v-fade-transition>&ndash;&gt;
         </v-sheet>
 
 
@@ -65,7 +156,7 @@
         </v-row>
       </v-sheet>
     </v-fade-transition>
-  </template>
+  </template>-->
 </template>
 
 
@@ -76,15 +167,17 @@ import invert from 'invert-color'
 import { theme } from "@/store/theme.store.js"
 import {averageColor, isMuted, isPlaying, musicVolume, paletteColors, radioSource} from "@/store/radio/playing.store.js"
 import ProgressBG from "@/components/app/progress.component.vue";
-import { cover_palette } from "@/libs/palette.js";
+import {cover_palette, md} from "@/libs/palette.js";
 import { prepared_palette } from "@/libs/color.js";
 import WeveComp from "@/components/app/wave.comp.vue";
+import LyricsShell from "@/components/app/lyrics.comp.vue";
 
 export default {
   name: 'MusicView',
-  components: {WeveComp, ProgressBG},
+  components: {LyricsShell, WeveComp, ProgressBG},
   data() {
     return {
+      show_volume: false,
       leblure: false,
       delay: false,
       marquee: false,
@@ -104,6 +197,7 @@ export default {
     },
   },
   methods: {
+    md,
     prepared_palette,
     check_is_dark: function (color) {
       if(color) {
@@ -196,6 +290,9 @@ export default {
     }
   },
   computed: {
+    isDark() {
+      return this.check_is_dark(this.average)
+    },
     segments() {
       return {
         top_right:  this.duration_perc > 12.5 ? 100 : 100 * (0 - this.duration_perc) / (0 - 12.5) < 0 ? 0 : 100 * (0 - this.duration_perc) / (0 - 12.5),
@@ -463,6 +560,12 @@ export default {
     -webkit-transform: rotate(360deg);
     transform: rotate(360deg);
   }
+}
+
+.my-track-cover {
+  transition: 0.3s;
+  scale: 1.06;
+  box-shadow: 0 30px 30px rgba(0,0,0,0.3) !important;
 }
 
 </style>
